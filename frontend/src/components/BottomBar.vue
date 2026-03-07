@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-5 bg-surface-modal border-t border-outline-gray-2 standalone:pb-4"
+    class="grid grid-cols-5 bg-surface-modal border-t border-outline-gray-2 standalone:pb-4 safe-area-bottom"
     :style="{
       gridTemplateColumns: `repeat(${sidebarItems.length}, minmax(0, 1fr))`,
     }"
@@ -8,14 +8,18 @@
     <button
       v-for="tab in sidebarItems"
       :key="tab.label"
-      class="flex flex-col items-center justify-center transition active:scale-95 h-[50px]"
+      class="flex flex-col items-center justify-center transition active:scale-95 h-[54px] gap-0.5"
       @click="$router.push(tab.route)"
     >
       <component
         :is="tab.icon"
-        class="size-6"
+        class="size-5"
         :class="[tab.highlight() ? 'text-ink-gray-8' : 'text-ink-gray-5']"
       />
+      <span
+        class="text-[10px] leading-none"
+        :class="[tab.highlight() ? 'text-ink-gray-8 font-medium' : 'text-ink-gray-5']"
+      >{{ tab.label }}</span>
     </button>
   </div>
 </template>

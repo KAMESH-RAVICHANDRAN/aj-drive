@@ -103,18 +103,28 @@ def signup(account_request: str, first_name: str, last_name: str | None = None, 
     account_request.signed_up = 1
     account_request.save(ignore_permissions=True)
 
-    team = None
+    team_name = None
     if account_request.invite:
         invite = frappe.get_doc("Drive User Invitation", account_request.invite)
         invite.status = "Accepted"
         invite.save(ignore_permissions=True)
         if invite.team:
             # Add to that team
-            team = frappe.get_doc("Drive Team", invite.team)
-            team.append("users", {"user": user.email, "access_level": 0 if invite.as_guest else 1})
-            team.save(ignore_permissions=True)
-            team = invite.team
-    return {"location": f"/drive/t/{team}" if team else "/drive/"}
+            drive_team = frappe.get_doc("Drive Team", invite.team)
+            drive_team.append("users", {"user": user.email, "access_level": 0 if invite.as_guest else 1})
+            drive_team.save(ignore_permissions=True)
+            team_name = invite.team
+    else:
+        # Create personal team immediately — no setup page needed
+        if not frappe.db.exists("Drive Team", {"owner": user.email, "personal": 1}):
+            personal_team = frappe.get_doc({
+                "doctype": "Drive Team",
+                "title": user.email,
+                "personal": 1,
+            }).insert(ignore_permissions=True)
+            frappe.db.commit()
+
+    return {"location": f"/drive/t/{team_name}" if team_name else "/drive"}
 
 
 def create_user(email, first_name, last_name=None, login=False):
@@ -123,7 +133,7 @@ def create_user(email, first_name, last_name=None, login=False):
             "doctype": "User",
             "email": email,
             "first_name": escape_html(first_name),
-            "last_name": escape_html(last_name),
+            "last_name": escape_html(last_name) if last_name else "",
             "enabled": 1,
             "user_type": "Website User",
         }
@@ -136,20 +146,29 @@ def create_user(email, first_name, last_name=None, login=False):
     except frappe.DuplicateEntryError:
         frappe.throw("User already exists")
 
-    # Assign Drive User role so they can create teams
-    if not frappe.db.exists("Has Role", {"parent": email, "role": "Drive User"}):
-        role_doc = frappe.get_doc({"doctype": "Has Role", "parent": email, "parenttype": "User", "parentfield": "roles", "role": "Drive User"})
-        role_doc.insert(ignore_permissions=True)
+    # Assign Drive User role using Frappe's proper method
+    try:
+        user.add_roles("Drive User")
+    except Exception:
+        # Fallback: direct insert
+        if not frappe.db.exists("Has Role", {"parent": email, "role": "Drive User"}):
+            frappe.get_doc({
+                "doctype": "Has Role",
+                "parent": email,
+                "parenttype": "User",
+                "parentfield": "roles",
+                "role": "Drive User"
+            }).insert(ignore_permissions=True)
+
+    # Create Drive Settings for user
+    if not frappe.db.exists("Drive Settings", {"user": email}):
+        frappe.get_doc({"doctype": "Drive Settings", "user": email}).insert(ignore_permissions=True)
+
+    frappe.db.commit()
 
     if login:
         frappe.local.login_manager.login_as(user.email)
-    doc = frappe.get_doc(
-        {
-            "doctype": "Drive Settings",
-            "user": email,
-        }
-    )
-    doc.insert()
+
     return user
 
 

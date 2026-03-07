@@ -2,13 +2,13 @@
   <!-- pt-1 to accomodate borders -->
   <div
     v-if="rows?.length"
-    class="grid-container gap-5 p-5 pb-[60px] overflow-auto select-none"
+    class="grid-container gap-3 sm:gap-5 p-3 sm:p-5 pb-[70px] sm:pb-[60px] overflow-auto select-none"
   >
     <div
       v-for="file in rows"
       :id="file.name"
       :key="file.name"
-      class="grid-item rounded-lg group select-none entity cursor-pointer relative h-[172px] border bg-surface-white"
+      class="grid-item rounded-lg group select-none entity cursor-pointer relative h-[145px] sm:h-[172px] border bg-surface-white"
       :class="[
         selections.has(file.name) || selectedRow?.name === file.name
           ? 'bg-surface-gray-2 shadow-gray'

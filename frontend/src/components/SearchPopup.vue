@@ -24,28 +24,21 @@
         <div
           v-for="entity in searchResults.data"
           :key="entity.name"
-          class="grid grid-flow-col grid-cols-8 gap-2 w-full items-center rounded px-2 py-2 text-base cursor-pointer hover:bg-surface-gray-2"
+          class="flex gap-2 w-full items-center rounded px-2 py-2 text-base cursor-pointer hover:bg-surface-gray-2"
           @click="openEntity(entity), (open = false)"
         >
-          <div class="flex items-center gap-2 w-full col-span-6">
-            <img
-              class="size-4"
-              :src="getIconUrl(entity.is_group ? 'Folder' : entity.file_type)"
-            >
-            <span class="truncate">{{ entity.title }}</span>
-          </div>
-          <div
-            class="col-span-2 grid grid-flow-col justify-start items-center truncate"
+          <img
+            class="size-4 shrink-0"
+            :src="getIconUrl(entity.is_group ? 'Folder' : entity.file_type)"
           >
+          <span class="truncate flex-1 min-w-0">{{ entity.title }}</span>
+          <div class="hidden sm:flex items-center gap-1.5 shrink-0">
             <Avatar
               :image="entity.user_image"
               :label="entity.full_name || entity.user_name"
-              class="relative mr-2"
               size="xs"
             />
-            <span class="text-base text-ink-gray-8">{{
-              entity.full_name || entity.user_name
-            }}</span>
+            <span class="text-sm text-ink-gray-6 max-w-[120px] truncate">{{ entity.full_name || entity.user_name }}</span>
           </div>
         </div>
       </div>

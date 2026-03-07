@@ -4,7 +4,7 @@
     id="navbar"
     ondragstart="return false;"
     ondrop="return false;"
-    class="bg-surface-white border-b px-5 py-2.5 h-12 flex justify-between"
+    class="bg-surface-white border-b px-3 sm:px-5 py-2 sm:py-2.5 h-12 flex justify-between items-center"
   >
     <slot name="breadcrumbs">
       <Breadcrumbs
@@ -91,14 +91,15 @@
         :button="{
           variant: 'solid',
           id: 'create-button',
-          label: 'Create',
-          iconLeft: h(LucidePlus, { class: 'size-4' }),
+          label: isMobile ? undefined : 'Create',
+          icon: isMobile ? h(LucidePlus, { class: 'size-4' }) : undefined,
+          iconLeft: !isMobile ? h(LucidePlus, { class: 'size-4' }) : undefined,
         }"
         :options="newEntityOptions"
         placement="right"
       />
       <Button
-        v-else-if="$route.name === 'Documents' || $route.name === 'Slides'"
+        v-else-if="$route.name === 'Documents' || $route.name === 'Presentations'"
         id="create-button"
         label="Create"
         variant="solid"
@@ -132,12 +133,18 @@
 import { Button, Breadcrumbs, LoadingIndicator, Dropdown } from "frappe-ui"
 import { useStore } from "vuex"
 import emitter from "@/emitter"
-import { ref, computed, inject, h } from "vue"
+import { ref, computed, inject, h, onMounted, onUnmounted } from "vue"
+
+const isMobile = ref(window.innerWidth < 640)
+const onResize = () => { isMobile.value = window.innerWidth < 640 }
+onMounted(() => window.addEventListener('resize', onResize))
+onUnmounted(() => window.removeEventListener('resize', onResize))
 import { entitiesDownload } from "@/utils/download"
 import { getRecents, getTrash, toggleFav } from "@/resources/files"
 import { apps } from "@/resources/permissions"
 import { useRoute } from "vue-router"
-import { getLink, newExternal, dynamicList } from "@/utils/files"
+import { newExternal, dynamicList } from "@/utils/files"
+import { getFileLink } from "frappe-ui/drive/js/utils"
 
 import LucideClock from "~icons/lucide/clock"
 import LucideHome from "~icons/lucide/home"
@@ -219,7 +226,7 @@ const defaultActions = computed(() => {
         {
           label: __("Copy Link"),
           icon: LucideLink,
-          onClick: () => getLink(rootEntity.value),
+          onClick: () => getFileLink(rootEntity.value),
         },
       ],
     },
@@ -326,7 +333,7 @@ const newEntityOptions = computed(() => [
       {
         label: "Presentation",
         icon: LucideGalleryVerticalEnd,
-        onClick: () => (dialog.value = "p"),
+        onClick: () => newExternal("Presentation"),
         cond: isPrivate.value && apps.data?.find?.((k) => k.name === "slides"),
       },
       {
