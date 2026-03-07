@@ -13,7 +13,7 @@
               <p class="mb-2 text-2xl font-semibold leading-6 text-ink-gray-9">
                 {{
                   isLogin
-                    ? "Login to Drive"
+                    ? "Login to AJ Drive"
                     : params.get("t")
                     ? "Join " + params.get("t")
                     : "Create an account"
@@ -25,8 +25,8 @@
                 {{
                   !isLogin
                     ? params.get("t")
-                      ? "Powered by Frappe Drive."
-                      : "Welcome to Drive."
+                      ? "Powered by AJ Drive."
+                      : "Welcome to AJ Drive."
                     : "Welcome back!"
                 }}
               </p>
