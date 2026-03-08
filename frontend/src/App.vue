@@ -7,7 +7,7 @@
       <Sidebar v-if="normalView" />
       <div
         id="dropzone"
-        class="flex flex-col flex-1 overflow-hidden bg-surface-white relative pb-[54px] sm:pb-0"
+        class="flex flex-col flex-1 overflow-hidden bg-surface-white relative pb-[58px] sm:pb-0"
       >
         <router-view
           :key="$route.fullPath"
@@ -16,13 +16,14 @@
           <component :is="Component" />
         </router-view>
       </div>
-      <BottomBar
-        v-if="!inIframe && isLoggedIn"
-        class="fixed bottom-0 left-0 right-0 w-full sm:hidden z-50"
-      />
     </div>
+    <!-- BottomBar is OUTSIDE #dropzone so Dropzone.js touch events don't block it -->
+    <BottomBar
+      v-if="!inIframe && isLoggedIn"
+      class="fixed bottom-0 left-0 right-0 w-full sm:hidden z-[100]"
+    />
     <router-view
-      v-else
+      v-if="!(isLoggedIn || $route.meta.allowGuest)"
       :key="$route.fullPath"
       v-slot="{ Component }"
     >

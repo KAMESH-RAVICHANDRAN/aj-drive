@@ -97,11 +97,14 @@ function NonMergeMode(file) {
   return s
 }
 onMounted(() => {
+  // Disable drag-and-drop on touch devices — touch events interfere with BottomBar
+  const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches
+
   try {
     const existing = Dropzone.forElement("div#dropzone")
-
     if (existing) {
       dropzone.value = existing
+      if (isTouchDevice()) dropzone.value.removeEventListeners()
       return
     }
   } catch {}
@@ -158,6 +161,7 @@ onMounted(() => {
 
   dropzone.value.on("addedfile", function (file) {
     file.parent = store.state.currentFolder.name
+    emitter.emit('refresh')
     store.commit("addUpload", {
       uuid: file.upload.uuid,
       name: file.name,
