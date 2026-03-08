@@ -17,11 +17,13 @@
         </router-view>
       </div>
     </div>
-    <!-- BottomBar is OUTSIDE #dropzone so Dropzone.js touch events don't block it -->
-    <BottomBar
-      v-if="!inIframe && isLoggedIn"
-      class="fixed bottom-0 left-0 right-0 w-full sm:hidden z-[100]"
-    />
+    <!-- Teleport BottomBar to body to escape FrappeUIProvider stacking context -->
+    <Teleport to="body">
+      <BottomBar
+        v-if="!inIframe && isLoggedIn"
+        class="fixed bottom-0 left-0 right-0 w-full sm:hidden z-[9999]"
+      />
+    </Teleport>
     <router-view
       v-if="!(isLoggedIn || $route.meta.allowGuest)"
       :key="$route.fullPath"
