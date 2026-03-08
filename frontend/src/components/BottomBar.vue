@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-5 bg-surface-modal border-t border-outline-gray-2 standalone:pb-4 safe-area-bottom"
+    class="grid bg-surface-modal border-t border-outline-gray-2 safe-area-bottom shadow-[0_-1px_8px_rgba(0,0,0,0.06)]"
     :style="{
       gridTemplateColumns: `repeat(${sidebarItems.length}, minmax(0, 1fr))`,
     }"

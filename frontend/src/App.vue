@@ -7,7 +7,7 @@
       <Sidebar v-if="normalView" />
       <div
         id="dropzone"
-        class="flex flex-col flex-1 overflow-hidden bg-surface-white relative"
+        class="flex flex-col flex-1 overflow-hidden bg-surface-white relative pb-[54px] sm:pb-0"
       >
         <router-view
           :key="$route.fullPath"
@@ -18,7 +18,7 @@
       </div>
       <BottomBar
         v-if="!inIframe && isLoggedIn"
-        class="w-full sm:hidden"
+        class="fixed bottom-0 left-0 right-0 w-full sm:hidden z-50"
       />
     </div>
     <router-view
